@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2f6fe0">
+
+<!-- ✏️ CHỈNH 1 – TIÊU ĐỀ TAB TRÌNH DUYỆT
+     Đổi chữ "Việt Thắng" bên dưới thành tên bạn muốn hiện trên tab. -->
+<title>Việt Thắng – Trang cá nhân</title>
+
+<!-- ============================================================
+     HƯỚNG DẪN NHANH (đọc 1 lần là biết chỗ nào sửa gì)
+     Tìm các dòng bắt đầu bằng "✏️ CHỈNH" (bấm Ctrl+F gõ: CHỈNH)
+     để đến từng chỗ cần thay. Các số thứ tự CHỈNH 1, 2, 3...
+     đi từ trên xuống dưới trong file.
+
+       CHỈNH 1-3   : tiêu đề tab, ảnh nền, màu chủ đạo
+       CHỈNH 4-6   : thanh trên cùng, menu ☰, trang chủ
+       CHỈNH 7     : 4 thẻ ở trang chủ
+       CHỈNH 8     : câu nói truyền cảm hứng
+       CHỈNH 9     : trang "Ý tưởng"
+       CHỈNH 10    : trang "Dự án" (có nút tải .zip)
+       CHỈNH 11    : trang "Giới thiệu"
+       CHỈNH 12    : trang "Liên hệ"
+       CHỈNH 13    : trang "Khám phá" (tài liệu tải về)
+     ============================================================ -->
+
+<style>
+  :root {
+    /* ✏️ CHỈNH 2 – ẢNH NỀN THẬT (không bắt buộc)
+       Hiện tại nền là tranh vẽ bằng code (bầu trời, đảo, mặt nước).
+       Muốn dùng ảnh của bạn: đặt file ảnh cùng thư mục với file này,
+       rồi đổi  none  thành  url("ten-anh.jpg")
+       Ví dụ:  --anh-nen: url("nen.jpg");
+       Muốn quay lại nền vẽ sẵn: đổi lại thành  none */
+    --anh-nen: none;
+
+    /* ✏️ CHỈNH 3 – MÀU CHỦ ĐẠO
+       --mau-nhan: màu chữ nút / tab đang chọn (mã màu #RRGGBB).
+       Đổi mã màu nếu muốn tông khác (ví dụ tím #7a5cf0, xanh lá #1fa57a). */
+    --mau-nhan: #1d46b8;
+    --chu: #ffffff;
+    --chu-mo: rgba(255,255,255,.78);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body { overflow-x: hidden; }
+  body {
+    font-family: -apple-system, "SF Pro Display", "Segoe UI", Roboto, system-ui, sans-serif;
+    color: var(--chu);
+    background: #2f6fe0;
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+
+  /* ---------- NỀN ---------- */
+  .scene { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -3; }
+  .photo { position: fixed; inset: 0; z-index: -2; background: var(--anh-nen) center / cover no-repeat; }
+  .shade { position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(180deg, rgba(20,50,150,0) 45%, rgba(25,50,150,.35) 100%); }
+
+  /* ---------- KÍNH MỜ (hiệu ứng chính) ---------- */
+  .glass {
+    background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.10));
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid rgba(255,255,255,.38);
+    box-shadow: 0 10px 30px rgba(20,50,150,.25), inset 0 1px 0 rgba(255,255,255,.55);
+  }
+
+  .app { max-width: 480px; margin: 0 auto; padding: 58px 16px 130px; position: relative; overflow-x: clip; }
+
+  /* ---------- THANH TRÊN ---------- */
+  .topbar {
+    position: fixed; top: calc(8px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+    width: min(calc(100% - 32px), 448px); z-index: 40;
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 5px 4px 5px; border-radius: 999px;
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    display: grid; place-items: center; font-weight: 700; font-size: .95rem;
+    background: radial-gradient(circle at 30% 25%, #ffffff, #8fb6ff 55%, #4b78e6);
+    color: #1d46b8; box-shadow: inset 0 0 0 2px rgba(255,255,255,.6);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .topbar .name { font-weight: 600; font-size: .95rem; flex: 1; white-space: nowrap; }
+  .menu-btn {
+    width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+    background: rgba(255,255,255,.25); font-size: 1rem;
+  }
+  .dropdown {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 19;
+    border-radius: 24px; padding: 6px; display: none; background: rgba(40,80,190,.55);
+  }
+  .dropdown.open { display: block; animation: pop .25s ease; }
+  .dropdown button { display: block; width: 100%; text-align: left; padding: 12px 16px; border-radius: 16px; font-size: 1rem; }
+  .dropdown button:active { background: rgba(255,255,255,.2); }
+
+  /* ---------- TRANG ---------- */
+  .page { display: none; }
+  /* Không animate opacity trên trang/kính: opacity làm hiệu ứng kính mờ hiện trắng đục rồi mới ngả xanh */
+  .page.active { display: block; }
+  /* Chuyển động chỉ dùng transform (không opacity) nên kính luôn giữ màu xanh đục.
+     Các mục trồi lên lần lượt, hơi phóng nhẹ. */
+  .page.active > *:not(.grid),
+  .page.active .grid > .tile {
+    animation: rise .5s cubic-bezier(.2,.9,.25,1.1) backwards;
+  }
+  .page.active > *:nth-child(2) { animation-delay: .04s; }
+  .page.active > *:nth-child(3) { animation-delay: .08s; }
+  .page.active > *:nth-child(4) { animation-delay: .12s; }
+  .page.active > *:nth-child(5) { animation-delay: .16s; }
+  .page.active > *:nth-child(6) { animation-delay: .20s; }
+  .page.active > *:nth-child(n+7) { animation-delay: .24s; }
+  .page.active .grid > .tile:nth-child(1) { animation-delay: .10s; }
+  .page.active .grid > .tile:nth-child(2) { animation-delay: .16s; }
+  .page.active .grid > .tile:nth-child(3) { animation-delay: .22s; }
+  .page.active .grid > .tile:nth-child(4) { animation-delay: .28s; }
+  @keyframes rise { from { transform: translateY(26px) scale(.95); } to { transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .page.active > *, .page.active .grid > .tile { animation: none !important; }
+  }
+  @keyframes pop { from { transform: scale(.97); } to { transform: none; } }
+
+  /* ---------- TRANG CHỦ ---------- */
+  .hero { position: relative; padding: 56px 4px 28px; min-height: 380px; }
+  .hero .hi { font-size: 1.5rem; font-weight: 300; opacity: .95; }
+  .hero h1 {
+    font-size: clamp(3rem, 15vw, 4.4rem); line-height: 1.08; font-weight: 700; letter-spacing: -1px;
+    background: linear-gradient(180deg, #ffffff 30%, #d9e1ff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 6px 30px rgba(30,60,180,.25);
+  }
+  .hero .sub { margin: 10px 0 22px; font-size: 1.1rem; color: var(--chu-mo); max-width: 300px; }
+  .cta {
+    display: inline-flex; align-items: center; gap: 14px; padding: 8px 8px 8px 24px;
+    border-radius: 999px; color: var(--mau-nhan); font-weight: 600; font-size: 1.05rem;
+    background: linear-gradient(135deg, rgba(255,255,255,.75), rgba(255,255,255,.45));
+    border: 1px solid rgba(255,255,255,.7); box-shadow: 0 8px 24px rgba(20,50,150,.25);
+  }
+  .cta i {
+    width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, #5b8cf5, #2f58d8); color: #fff; font-style: normal; font-size: 1.2rem;
+  }
+  /* khối kính trang trí ở góc phải hero */
+  .orb {
+    position: absolute; right: -50px; top: 30px; width: 240px; height: 240px; z-index: -1;
+    border-radius: 48% 52% 50% 50% / 55% 55% 45% 45%;
+    background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.65), rgba(255,255,255,.12) 60%, rgba(255,255,255,.3));
+    border: 1px solid rgba(255,255,255,.5); box-shadow: inset 0 0 40px rgba(255,255,255,.35), 0 20px 50px rgba(30,60,180,.25);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    animation: float 6s ease-in-out infinite;
+  }
+  .orb::after {
+    content: ""; position: absolute; left: 90px; top: -62px; width: 70px; height: 90px;
+    border-radius: 0 100% 0 100%; transform: rotate(-12deg);
+    background: linear-gradient(135deg, rgba(255,255,255,.8), rgba(255,255,255,.15));
+    border: 1px solid rgba(255,255,255,.6);
+  }
+  @keyframes float { 50% { transform: translateY(-10px); } }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  .tile {
+    position: relative; overflow: hidden; text-align: left; min-height: 150px;
+    border-radius: 28px; padding: 16px 14px 14px; transition: transform .15s;
+  }
+  .tile:active { transform: scale(.97); }
+  .tile .ico {
+    width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center;
+    font-size: 1.2rem; margin-bottom: 8px; box-shadow: 0 4px 10px rgba(0,0,0,.2);
+  }
+  .tile h3 { font-size: 1.15rem; font-weight: 600; }
+  .tile p { font-size: .8rem; color: var(--chu-mo); max-width: 110px; line-height: 1.35; margin-top: 2px; }
+  .tile .go {
+    position: absolute; left: 14px; bottom: 12px; width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; background: rgba(255,255,255,.3); font-size: .9rem;
+  }
+  .deco { position: absolute; right: -8px; bottom: -6px; width: 90px; height: 90px; opacity: .9; pointer-events: none; }
+  .deco.swoosh { border-radius: 60% 40% 70% 30% / 50% 60% 40% 50%; background: linear-gradient(160deg, rgba(255,255,255,.7), rgba(120,170,255,.25)); transform: rotate(20deg); }
+  .deco.cube { border-radius: 22px; transform: rotate(18deg); background: linear-gradient(135deg, rgba(255,255,255,.7), rgba(100,160,255,.35)); box-shadow: -14px 14px 0 rgba(255,255,255,.18); }
+  .deco.star { clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%); background: linear-gradient(135deg, #fff, #c9b8ff 55%, #8fb6ff); }
+  .deco.plane { clip-path: polygon(0 45%, 100% 0, 62% 100%, 48% 62%); background: linear-gradient(135deg, #fff, #a9ccff); }
+
+  /* ---------- ICON PNG ----------
+     Ảnh PNG chỉ hiện khi file tồn tại; nếu chưa có, trang tự dùng icon tạm (emoji/hình vẽ sẵn). */
+  img.png { display: none; object-fit: contain; width: 100%; height: 100%; }
+  .has-png > img.png { display: block; }
+  .has-png > .fb { display: none; }
+  .ico.has-png { background: none !important; box-shadow: none; width: 46px; height: 46px; }
+  .deco.has-png { background: none !important; clip-path: none; box-shadow: none; transform: none; border-radius: 0; width: 110px; height: 110px; right: -6px; bottom: -6px; }
+  .ti { display: block; width: 28px; height: 28px; }
+  .line .ic { width: 38px; height: 38px; display: grid; place-items: center; font-size: 1.5rem; flex-shrink: 0; }
+
+  .quote {
+    display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 10px 10px 18px; border-radius: 999px;
+  }
+  .quote .wave { display: flex; gap: 3px; align-items: center; height: 26px; }
+  .quote .wave b { width: 3px; background: #fff; border-radius: 3px; opacity: .85; }
+  .quote .txt { flex: 1; font-style: italic; font-size: .95rem; border-left: 1px solid rgba(255,255,255,.4); padding-left: 12px; }
+  .quote .next { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.35); display: grid; place-items: center; }
+
+  /* ---------- TRANG CON ---------- */
+  .back { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px 9px 12px; border-radius: 999px; margin: 22px 0 6px; font-weight: 500; }
+  .page h2 { font-size: 2.1rem; font-weight: 700; margin: 10px 4px 4px; letter-spacing: -.5px; }
+  .page .lead { color: var(--chu-mo); margin: 0 4px 18px; }
+  .card { border-radius: 26px; padding: 18px; margin-bottom: 14px; }
+  .card h3 { font-size: 1.2rem; margin-bottom: 4px; }
+  .card p { color: var(--chu-mo); font-size: .96rem; }
+  .row { display: flex; gap: 14px; align-items: flex-start; }
+  .row .em { font-size: 1.8rem; line-height: 1; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .tag { padding: 5px 13px; border-radius: 999px; font-size: .82rem; background: rgba(255,255,255,.25); border: 1px solid rgba(255,255,255,.35); }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .pill {
+    padding: 9px 18px; border-radius: 999px; font-weight: 600; font-size: .92rem;
+    background: rgba(255,255,255,.85); color: var(--mau-nhan);
+  }
+  .pill.ghost { background: rgba(255,255,255,.22); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+  .big-avatar { width: 110px; height: 110px; font-size: 2.8rem; margin: 6px 0 12px; }
+  .info { list-style: none; display: grid; gap: 8px; margin-top: 10px; }
+  .info li { display: flex; gap: 10px; font-size: .96rem; }
+  .info b { min-width: 92px; font-weight: 500; color: var(--chu-mo); }
+  .line { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 22px; margin-bottom: 12px; }
+  .line .em { font-size: 1.5rem; }
+  .line small { display: block; color: var(--chu-mo); font-size: .8rem; }
+  .line .arrow { margin-left: auto; opacity: .8; }
+  .bar { margin-top: 12px; }
+  .bar div:first-child { display: flex; justify-content: space-between; font-size: .9rem; margin-bottom: 5px; }
+  .track { height: 8px; border-radius: 8px; background: rgba(255,255,255,.25); overflow: hidden; }
+  .fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #fff, #bcd3ff); }
+
+  /* ---------- THANH TAB DƯỚI ---------- */
+  .tabbar {
+    position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+    width: min(calc(100% - 28px), 452px); z-index: 30;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 8px; border-radius: 34px;
+  }
+  .tab { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0 7px; border-radius: 26px; font-size: .78rem; color: var(--chu-mo); transition: .2s; }
+  .tab svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tab.active { background: rgba(255,255,255,.35); color: var(--mau-nhan); font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
+  .tab.active svg { stroke: var(--mau-nhan); fill: rgba(70,120,240,.25); }
+
+  @media (min-width: 700px) { .app { padding-top: 28px; } }
+</style>
+</head>
+
+<body>
+
+<!-- ============ NỀN PHONG CẢNH (vẽ bằng code, không cần ảnh) ============ -->
+<svg class="scene" viewBox="0 0 430 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a63dc"/><stop offset=".45" stop-color="#5b9af2"/><stop offset="1" stop-color="#b4d3fa"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a6c9f6"/><stop offset=".35" stop-color="#5b8ae0"/><stop offset="1" stop-color="#3a60c8"/>
+    </linearGradient>
+    <linearGradient id="mount" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c98e2"/><stop offset="1" stop-color="#3f55a8"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#79b996"/><stop offset="1" stop-color="#427f82"/>
+    </linearGradient>
+    <radialGradient id="glow"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <filter id="b3"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="b8"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="b14"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <rect width="430" height="480" fill="url(#sky)"/>
+  <circle cx="330" cy="300" r="140" fill="url(#glow)"/>
+  <g fill="#fff" filter="url(#b8)" opacity=".85">
+    <ellipse cx="40" cy="70" rx="70" ry="26"/><ellipse cx="95" cy="52" rx="48" ry="26"/>
+    <ellipse cx="20" cy="330" rx="60" ry="22"/><ellipse cx="85" cy="350" rx="70" ry="18"/>
+    <ellipse cx="400" cy="230" rx="55" ry="26"/><ellipse cx="365" cy="255" rx="50" ry="18"/>
+    <ellipse cx="410" cy="150" rx="40" ry="14"/>
+  </g>
+
+  <rect y="470" width="430" height="430" fill="url(#water)"/>
+
+  <!-- phản chiếu trên mặt nước -->
+  <g transform="translate(0,944) scale(1,-1)" opacity=".28" filter="url(#b3)">
+    <path d="M110 472 C160 458 205 440 245 420 C285 398 312 362 342 352 C372 344 395 352 430 340 L430 472 Z" fill="#5870c4"/>
+  </g>
+
+  <!-- đảo núi -->
+  <path d="M110 472 C160 458 205 440 245 420 C285 398 312 362 342 352 C372 344 395 352 430 340 L430 472 Z" fill="url(#mount)"/>
+  <path d="M245 420 C285 398 312 362 342 352 C372 344 395 352 430 340 L430 358 C395 368 372 362 346 370 C318 380 292 412 258 432 Z" fill="url(#grass)"/>
+  <g stroke="#e9eefc" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <path d="M334 354v-18M356 352v-17M329 340h31M333 346h24"/>
+  </g>
+  <g fill="#fff" filter="url(#b8)" opacity=".9">
+    <ellipse cx="200" cy="474" rx="120" ry="16"/><ellipse cx="335" cy="468" rx="105" ry="15"/><ellipse cx="420" cy="452" rx="60" ry="20"/>
+  </g>
+
+  <g stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round" fill="none">
+    <path d="M20 520h120M200 540h160M60 580h100M250 610h140M30 650h90"/>
+  </g>
+  <g fill="#7f8ff2" filter="url(#b3)" opacity=".85">
+    <circle cx="14" cy="640" r="7"/><circle cx="34" cy="618" r="6"/><circle cx="60" cy="660" r="8"/><circle cx="410" cy="620" r="7"/><circle cx="395" cy="650" r="9"/>
+  </g>
+</svg>
+<div class="photo"></div>
+<div class="shade"></div>
+
+<div class="app">
+
+  <!-- ============ THANH TRÊN CÙNG ============ -->
+  <header class="topbar glass">
+    <!-- ✏️ CHỈNH 4 – ẢNH ĐẠI DIỆN + TÊN NGẮN TRÊN THANH
+         • Ảnh: xóa chữ "T" rồi bỏ dấu comment của dòng <img> dưới đây,
+           đổi "anh-cua-toi.jpg" thành tên file ảnh của bạn (cùng thư mục).
+         • Tên: đổi "Việt Thắng" ở thẻ <span class="name"> bên dưới.
+         Lưu ý: không dùng logo Apple vì đó là nhãn hiệu của hãng khác. -->
+    <div class="avatar">T<!-- <img src="anh-cua-toi.jpg" alt="Ảnh đại diện"> --></div>
+    <span class="name">Việt Thắng</span>
+    <button class="menu-btn" id="menuBtn" aria-label="Mở menu">☰</button>
+
+    <!-- ✏️ CHỈNH 5 – MENU ☰ (bấm nút ☰ thì xổ ra)
+         Mỗi nút là một mục. data-go="..." là trang sẽ mở, KHÔNG đổi giá trị này.
+         Chỉ đổi chữ hiển thị giữa hai thẻ <button>...</button>.
+         Các giá trị data-go hợp lệ: home, y-tuong, du-an, gioi-thieu, lien-he, kham-pha -->
+    <div class="dropdown glass" id="dropdown">
+      <button data-go="home">🏠 Trang chủ</button>
+      <button data-go="kham-pha">🧭 Khám phá</button>
+      <button data-go="y-tuong">💡 Ý tưởng</button>
+      <button data-go="du-an">📁 Dự án</button>
+      <button data-go="gioi-thieu">⭐ Giới thiệu</button>
+      <button data-go="lien-he">✈️ Liên hệ</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ================= TRANG CHỦ ================= -->
+    <section class="page active" id="page-home">
+      <div class="hero">
+        <div class="orb"></div>
+        <!-- ✏️ CHỈNH 6 – PHẦN CHÀO MỪNG Ở TRANG CHỦ
+             • "Xin chào!"  : đổi lời chào nếu muốn.
+             • <h1>         : tên lớn của bạn (nên để ngắn, 1–2 từ để không bị xuống dòng).
+             • <p class="sub">: khẩu hiệu ngắn mô tả bạn.
+             • Nút "Khám phá ngay": data-go="kham-pha" nghĩa là bấm vào sẽ mở trang Khám phá.
+               Muốn mở trang khác thì đổi thành y-tuong, du-an, gioi-thieu hoặc lien-he. -->
+        <div class="hi">Xin chào! 👋</div>
+        <h1>Việt Thắng</h1>
+        <p class="sub">Khám phá • Sáng tạo • Phát triển cùng những ý tưởng tuyệt vời ✨</p>
+        <button class="cta" data-go="kham-pha">Khám phá ngay <i>→</i></button>
+      </div>
+
+      <!-- ✏️ CHỈNH 7 – 4 THẺ Ở TRANG CHỦ
+           Mỗi thẻ là một <button class="tile ..."> gồm:
+             • data-go="..."  : trang mở ra khi bấm (không đổi nếu không cần)
+             • <div class="ico"> : biểu tượng (đổi emoji bằng emoji khác, ví dụ 🎯 🚀 🎨)
+             • <h3>           : tiêu đề thẻ
+             • <p>            : mô tả ngắn (nên dưới 40 ký tự)
+             • style="background:..." trong .ico: màu nền ô biểu tượng (mã màu tùy ý) -->
+      <!-- ✏️ CHỈNH 7b – ICON PNG CỦA 4 THẺ
+           Mỗi thẻ có 2 ảnh PNG:
+             1) Icon nhỏ (góc trên trái)  → <img src="icons/ten-file.png"> trong <div class="ico">
+                  Kích thước gợi ý: 128×128 px, nền trong suốt.
+             2) Hình 3D lớn (góc dưới phải) → <img src="icons/ten-file.png"> trong <span class="deco">
+                  Kích thước gợi ý: 300×300 px, nền trong suốt.
+           CÁCH THAY: tạo thư mục "icons" cùng chỗ với file HTML, đặt ảnh PNG vào đó
+           với ĐÚNG tên như dưới đây (hoặc đổi tên trong src="..." cho khớp ảnh của bạn):
+             icons/y-tuong.png      icons/3d-y-tuong.png
+             icons/du-an.png        icons/3d-du-an.png
+             icons/gioi-thieu.png   icons/3d-gioi-thieu.png
+             icons/lien-he.png      icons/3d-lien-he.png
+           Chưa có ảnh nào thì cứ để vậy, trang dùng icon tạm; có ảnh nào là tự thay ảnh đó. -->
+      <div class="grid">
+        <button class="tile glass" data-go="y-tuong">
+          <div class="ico" style="background:linear-gradient(135deg,#4c8bff,#2a3fd8)"><span class="fb">💡</span><img class="png" src="icons/y-tuong.png" alt=""></div>
+          <h3>Ý tưởng</h3><p>Những ý tưởng sáng tạo độc đáo.</p>
+          <span class="go">→</span><span class="deco swoosh"><img class="png" src="icons/3d-y-tuong.png" alt=""></span>
+        </button>
+        <button class="tile glass" data-go="du-an">
+          <div class="ico" style="background:linear-gradient(135deg,#5ad0ff,#2b9be8)"><span class="fb">📁</span><img class="png" src="icons/du-an.png" alt=""></div>
+          <h3>Dự án</h3><p>Các dự án nổi bật của tôi.</p>
+          <span class="go">→</span><span class="deco cube"><img class="png" src="icons/3d-du-an.png" alt=""></span>
+        </button>
+        <button class="tile glass" data-go="gioi-thieu">
+          <div class="ico" style="background:linear-gradient(135deg,#b07bff,#6a45e6)"><span class="fb">⭐</span><img class="png" src="icons/gioi-thieu.png" alt=""></div>
+          <h3>Giới thiệu</h3><p>Tìm hiểu thêm về tôi nhé!</p>
+          <span class="go">→</span><span class="deco star"><img class="png" src="icons/3d-gioi-thieu.png" alt=""></span>
+        </button>
+        <button class="tile glass" data-go="lien-he">
+          <div class="ico" style="background:linear-gradient(135deg,#59a8ff,#2f6df0)"><span class="fb">✈️</span><img class="png" src="icons/lien-he.png" alt=""></div>
+          <h3>Liên hệ</h3><p>Kết nối cùng tôi.</p>
+          <span class="go">→</span><span class="deco plane"><img class="png" src="icons/3d-lien-he.png" alt=""></span>
+        </button>
+      </div>
+
+      <!-- ✏️ CHỈNH 8 – CÂU NÓI TRUYỀN CẢM HỨNG
+           Câu đầu tiên hiện sẵn nằm trong <span id="quoteText">.
+           Bấm nút ▶ sẽ chuyển sang câu kế tiếp trong danh sách ở cuối file
+           (tìm chữ "const quotes" để thêm/sửa/xóa câu). -->
+      <div class="quote glass">
+        <div class="wave"><b style="height:10px"></b><b style="height:22px"></b><b style="height:14px"></b><b style="height:26px"></b><b style="height:12px"></b><b style="height:20px"></b></div>
+        <span class="txt" id="quoteText">“Dream bigger, create better.”</span>
+        <button class="next" id="quoteBtn" aria-label="Câu tiếp theo">▶</button>
+      </div>
+    </section>
+
+    <!-- ================= Ý TƯỞNG ================= -->
+    <section class="page" id="page-y-tuong">
+      <button class="back glass" data-go="home">‹ Trang chủ</button>
+      <h2>Ý tưởng</h2>
+      <p class="lead">Những ý tưởng sáng tạo của tôi.</p>
+
+      <!-- ✏️ CHỈNH 9 – CÁC Ý TƯỞNG CỦA BẠN
+           Mỗi ý tưởng là một khối <div class="card glass"> ... </div>.
+           • Đổi emoji trong <div class="em">
+           • Đổi tiêu đề trong <h3>, mô tả trong <p>
+           • Đổi các nhãn trong <span class="tag">
+           THÊM ý tưởng: sao chép nguyên một khối card rồi dán nối tiếp ngay bên dưới.
+           XÓA ý tưởng: xóa nguyên khối từ <div class="card glass"> đến </div> tương ứng. -->
+      <div class="card glass">
+        <div class="row"><div class="em">🌱</div><div>
+          <h3>Tên ý tưởng 1</h3>
+          <p>Mô tả ngắn gọn ý tưởng của bạn: nó giải quyết vấn đề gì, dành cho ai.</p>
+          <div class="tags"><span class="tag">Giáo dục</span><span class="tag">Ứng dụng</span></div>
+        </div></div>
+      </div>
+      <div class="card glass">
+        <div class="row"><div class="em">🎨</div><div>
+          <h3>Tên ý tưởng 2</h3>
+          <p>Mô tả ý tưởng thứ hai. Có thể viết 1–3 câu.</p>
+          <div class="tags"><span class="tag">Thiết kế</span></div>
+        </div></div>
+      </div>
+      <div class="card glass">
+        <div class="row"><div class="em">🚀</div><div>
+          <h3>Tên ý tưởng 3</h3>
+          <p>Mô tả ý tưởng thứ ba.</p>
+          <div class="tags"><span class="tag">Công nghệ</span><span class="tag">Cộng đồng</span></div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ================= DỰ ÁN ================= -->
+    <section class="page" id="page-du-an">
+      <button class="back glass" data-go="home">‹ Trang chủ</button>
+      <h2>Dự án</h2>
+      <p class="lead">Các dự án nổi bật của tôi.</p>
+
+      <!-- ✏️ CHỈNH 10 – CÁC DỰ ÁN + NÚT TẢI .ZIP
+           Mỗi dự án là một khối <div class="card glass">.
+           • <h3>: tên dự án;  <p>: mô tả;  <span class="tag">: công nghệ / nhãn.
+           • Nút "Sao chép link": bấm vào sẽ sao chép link MediaFire vào bộ nhớ tạm.
+             Đổi link trong data-copy="..." thành link MediaFire thật của bạn.
+           THÊM dự án: sao chép cả khối card rồi dán nối tiếp. -->
+      <div class="card glass">
+        <h3>📦 Tên dự án 1</h3>
+        <p>Mô tả ngắn dự án: làm gì, bạn đảm nhận phần nào, kết quả ra sao.</p>
+        <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span></div>
+        <div class="btns">
+          <button class="pill" data-copy="https://www.mediafire.com/file/MA-FILE-1/du-an-1.zip/file">🔗 Sao chép link</button>
+        </div>
+      </div>
+      <div class="card glass">
+        <h3>📦 Tên dự án 2</h3>
+        <p>Mô tả dự án thứ hai.</p>
+        <div class="tags"><span class="tag">JavaScript</span></div>
+        <div class="btns">
+          <button class="pill" data-copy="https://www.mediafire.com/file/MA-FILE-2/du-an-2.zip/file">🔗 Sao chép link</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= GIỚI THIỆU ================= -->
+    <section class="page" id="page-gioi-thieu">
+      <button class="back glass" data-go="home">‹ Trang chủ</button>
+      <h2>Giới thiệu</h2>
+      <p class="lead">Tìm hiểu thêm về tôi nhé!</p>
+
+      <!-- ✏️ CHỈNH 11 – GIỚI THIỆU BẢN THÂN
+           a) Ảnh lớn: thay chữ "T" bằng chữ cái của bạn, hoặc bỏ comment dòng <img> và đổi tên file ảnh.
+           b) <h3> + <p> đầu: câu chuyện của bạn (vài câu).
+           c) Danh sách "Thông tin": sửa phần chữ sau mỗi nhãn (Họ tên, Ngày sinh, Nơi ở, Nghề nghiệp).
+           d) Kỹ năng: đổi tên kỹ năng, và đổi con số % ở HAI chỗ (chữ hiển thị và style="width:..%").
+           e) Sở thích: sửa các <span class="tag">. -->
+      <div class="card glass">
+        <div class="avatar big-avatar">T<!-- <img src="anh-cua-toi.jpg" alt="Ảnh của tôi"> --></div>
+        <h3>Nguyễn Đoàn Việt Thắng</h3>
+        <p>Viết vài câu về bản thân: bạn là ai, đang học/làm gì, điều gì khiến bạn hứng thú và mục tiêu sắp tới.</p>
+        <ul class="info">
+          <li><b>Họ tên</b> Nguyễn Đoàn Việt Thắng</li>
+          <li><b>Ngày sinh</b> 01/01/2000</li>
+          <li><b>Nơi ở</b> Việt Nam</li>
+          <li><b>Nghề nghiệp</b> Sinh viên</li>
+        </ul>
+      </div>
+
+      <div class="card glass">
+        <h3>Kỹ năng</h3>
+        <div class="bar"><div><span>Kỹ năng 1</span><span>85%</span></div><div class="track"><div class="fill" style="width:85%"></div></div></div>
+        <div class="bar"><div><span>Kỹ năng 2</span><span>70%</span></div><div class="track"><div class="fill" style="width:70%"></div></div></div>
+        <div class="bar"><div><span>Kỹ năng 3</span><span>75%</span></div><div class="track"><div class="fill" style="width:75%"></div></div></div>
+      </div>
+
+      <div class="card glass">
+        <h3>Sở thích</h3>
+        <div class="tags"><span class="tag">📚 Đọc sách</span><span class="tag">🎧 Nghe nhạc</span><span class="tag">✈️ Du lịch</span><span class="tag">🎮 Chơi game</span></div>
+      </div>
+    </section>
+
+    <!-- ================= LIÊN HỆ ================= -->
+    <section class="page" id="page-lien-he">
+      <button class="back glass" data-go="home">‹ Trang chủ</button>
+      <h2>Liên hệ</h2>
+      <p class="lead">Kết nối cùng Việt Thắng.</p>
+
+      <!-- ✏️ CHỈNH 12 – THÔNG TIN LIÊN HỆ
+           Mỗi dòng là một thẻ <a class="line glass" href="...">.
+           • href: đường dẫn thật. Cách viết:
+               Email      → href="mailto:email-cua-ban@gmail.com"
+               Điện thoại → href="tel:0900000000"
+               Zalo       → href="https://zalo.me/số-điện-thoại"
+               Facebook   → href="https://facebook.com/tên-trang-của-bạn"
+               Discord    → href="https://discord.com/users/ID-số-của-bạn" (hoặc link mời server: https://discord.gg/mã-mời)
+           • Dòng chữ lớn (ví dụ "Email") là nhãn; dòng chữ nhỏ <small> là nội dung hiển thị — nhớ sửa cho khớp với href.
+           Muốn bỏ một dòng: xóa nguyên thẻ <a ...> ... </a> của dòng đó. -->
+      <!-- ICON PNG CỦA TRANG LIÊN HỆ: đặt ảnh PNG (gợi ý 96×96 px, nền trong suốt) vào thư mục "icons":
+             icons/email.png  icons/dien-thoai.png  icons/zalo.png  icons/facebook.png  icons/discord.png
+           Chưa có ảnh thì trang dùng emoji tạm. Muốn đổi tên ảnh: sửa src="..." trong dòng tương ứng. -->
+      <a class="line glass" href="mailto:email@example.com"><span class="ic"><span class="fb">✉️</span><img class="png" src="icons/email.png" alt=""></span><div>Email<small>email@example.com</small></div><span class="arrow">›</span></a>
+      <a class="line glass" href="tel:0900000000"><span class="ic"><span class="fb">📞</span><img class="png" src="icons/dien-thoai.png" alt=""></span><div>Điện thoại<small>0900 000 000</small></div><span class="arrow">›</span></a>
+      <a class="line glass" href="https://zalo.me/0900000000" target="_blank" rel="noopener"><span class="ic"><span class="fb">💬</span><img class="png" src="icons/zalo.png" alt=""></span><div>Zalo<small>0900 000 000</small></div><span class="arrow">›</span></a>
+      <a class="line glass" href="https://facebook.com/" target="_blank" rel="noopener"><span class="ic"><span class="fb">📘</span><img class="png" src="icons/facebook.png" alt=""></span><div>Facebook<small>facebook.com/ten-cua-ban</small></div><span class="arrow">›</span></a>
+      <a class="line glass" href="https://discord.com/users/ID-CUA-BAN" target="_blank" rel="noopener"><span class="ic"><span class="fb">🎮</span><img class="png" src="icons/discord.png" alt=""></span><div>Discord<small>ten-cua-ban</small></div><span class="arrow">›</span></a>
+    </section>
+
+    <!-- ================= KHÁM PHÁ ================= -->
+    <section class="page" id="page-kham-pha">
+      <button class="back glass" data-go="home">‹ Trang chủ</button>
+      <h2>Khám phá</h2>
+      <p class="lead">Lối tắt và tài liệu tải về.</p>
+
+      <!-- 3 lối tắt dưới dùng lại icon PNG của 3 thẻ trang chủ (icons/y-tuong.png, du-an.png, gioi-thieu.png) -->
+      <button class="line glass" data-go="y-tuong" style="width:100%;text-align:left"><span class="ic"><span class="fb">💡</span><img class="png" src="icons/y-tuong.png" alt=""></span><div>Ý tưởng<small>Những ý tưởng sáng tạo</small></div><span class="arrow">›</span></button>
+      <button class="line glass" data-go="du-an" style="width:100%;text-align:left"><span class="ic"><span class="fb">📁</span><img class="png" src="icons/du-an.png" alt=""></span><div>Dự án<small>Các dự án nổi bật</small></div><span class="arrow">›</span></button>
+      <button class="line glass" data-go="gioi-thieu" style="width:100%;text-align:left"><span class="ic"><span class="fb">⭐</span><img class="png" src="icons/gioi-thieu.png" alt=""></span><div>Giới thiệu<small>Về tôi</small></div><span class="arrow">›</span></button>
+
+      <!-- ✏️ CHỈNH 13 – TÀI LIỆU (SAO CHÉP LINK MEDIAFIRE)
+           Mỗi dòng là một tài liệu. Bấm vào dòng sẽ sao chép link vào bộ nhớ tạm.
+           1) Đổi link trong data-copy="..." thành link MediaFire thật của bạn.
+           2) Đổi chữ hiển thị (tên tài liệu) và <small> (ghi chú, dung lượng...). -->
+      <h2 style="font-size:1.4rem;margin-top:22px">Tài liệu</h2>
+      <!-- Icon file zip: đặt ảnh PNG tại icons/zip.png (gợi ý 96×96 px) -->
+      <button class="line glass" data-copy="https://www.mediafire.com/file/MA-FILE-3/tai-lieu-1.zip/file" style="width:100%;text-align:left"><span class="ic"><span class="fb">📦</span><img class="png" src="icons/zip.png" alt=""></span><div>Tên tài liệu 1<small>Bấm để sao chép link MediaFire</small></div><span class="arrow">🔗</span></button>
+      <button class="line glass" data-copy="https://www.mediafire.com/file/MA-FILE-4/tai-lieu-2.zip/file" style="width:100%;text-align:left"><span class="ic"><span class="fb">📦</span><img class="png" src="icons/zip.png" alt=""></span><div>Tên tài liệu 2<small>Bấm để sao chép link MediaFire</small></div><span class="arrow">🔗</span></button>
+    </section>
+
+  </main>
+
+  <!-- ============ THANH TAB DƯỚI ============
+       4 tab cố định. data-go là trang mở ra (không đổi); đổi chữ hiển thị trong <span> nếu muốn. -->
+  <!-- ✏️ CHỈNH 7c – ICON PNG CỦA THANH TAB DƯỚI
+       Đặt 4 ảnh PNG (nền trong suốt, gợi ý 96×96 px) vào thư mục "icons":
+         icons/tab-trang-chu.png   icons/tab-kham-pha.png
+         icons/tab-du-an.png       icons/tab-lien-he.png
+       Chưa có ảnh thì trang dùng icon vẽ sẵn. -->
+  <nav class="tabbar glass">
+    <button class="tab active" data-go="home">
+      <span class="ti"><svg class="fb" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><img class="png" src="icons/tab-trang-chu.png" alt=""></span><span>Trang chủ</span>
+    </button>
+    <button class="tab" data-go="kham-pha">
+      <span class="ti"><svg class="fb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><img class="png" src="icons/tab-kham-pha.png" alt=""></span><span>Khám phá</span>
+    </button>
+    <button class="tab" data-go="du-an">
+      <span class="ti"><svg class="fb" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg><img class="png" src="icons/tab-du-an.png" alt=""></span><span>Dự án</span>
+    </button>
+    <button class="tab" data-go="lien-he">
+      <span class="ti"><svg class="fb" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg><img class="png" src="icons/tab-lien-he.png" alt=""></span><span>Liên hệ</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+  // ----- Chuyển trang (không cần sửa) -----
+  const pages = document.querySelectorAll(".page");
+  const tabs = document.querySelectorAll(".tab");
+  const dropdown = document.getElementById("dropdown");
+
+  function show(id) {
+    if (!document.getElementById("page-" + id)) id = "home";
+    pages.forEach(p => p.classList.toggle("active", p.id === "page-" + id));
+    tabs.forEach(t => t.classList.toggle("active", t.dataset.go === id));
+    dropdown.classList.remove("open");
+    window.scrollTo({ top: 0 });
+  }
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-go]");
+    if (!el) return;
+    e.preventDefault();
+    const id = el.dataset.go;
+    if (location.hash === "#" + id) show(id); else location.hash = id;
+  });
+  window.addEventListener("hashchange", () => show(location.hash.slice(1) || "home"));
+  show(location.hash.slice(1) || "home");
+
+  // ----- Sao chép link khi bấm nút có data-copy (không cần sửa) -----
+  const toast = document.createElement("div");
+  toast.style.cssText = "position:fixed;left:50%;bottom:110px;transform:translateX(-50%);z-index:60;padding:10px 18px;border-radius:999px;background:rgba(29,70,184,.92);color:#fff;font-size:.92rem;font-weight:600;box-shadow:0 8px 24px rgba(20,50,150,.35);display:none;white-space:nowrap";
+  document.body.appendChild(toast);
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg; toast.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.style.display = "none", 1800);
+  }
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    return new Promise((res, rej) => {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.cssText = "position:fixed;opacity:0;top:0;left:0";
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand("copy") ? res() : rej(); } catch (e) { rej(e); } finally { ta.remove(); }
+    });
+  }
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-copy]");
+    if (!el) return;
+    copyText(el.dataset.copy).then(() => {
+      showToast("✓ Đã sao chép link MediaFire");
+      const target = el.classList.contains("line") ? el.querySelector(".arrow") : el;
+      const old = target.textContent;
+      target.textContent = el.classList.contains("line") ? "✓" : "✓ Đã sao chép";
+      setTimeout(() => target.textContent = old, 1800);
+    }).catch(() => showToast("Không sao chép được, hãy thử lại"));
+  });
+
+  document.getElementById("menuBtn").addEventListener("click", () => dropdown.classList.toggle("open"));
+
+  // ----- Icon PNG: có ảnh thì hiện ảnh, chưa có thì dùng icon tạm (không cần sửa) -----
+  document.querySelectorAll("img.png").forEach(img => {
+    const ok = () => img.parentElement.classList.add("has-png");
+    if (img.complete && img.naturalWidth > 0) ok();
+    else {
+      img.addEventListener("load", ok);
+      img.addEventListener("error", () => img.remove());
+    }
+  });
+
+  // ----- Câu nói truyền cảm hứng -----
+  // ✏️ CHỈNH 8 (tiếp) – Sửa/thêm/xóa các câu trong danh sách dưới đây.
+  // Mỗi câu nằm trong cặp dấu nháy kép "...", cách nhau bằng dấu phẩy, câu cuối không cần dấu phẩy.
+  const quotes = [
+    "“Dream bigger, create better.”",
+    "“Mỗi ngày tiến bộ thêm một chút.”",
+    "“Học hôm nay, tỏa sáng ngày mai.”"
+  ];
+  let qi = 0;
+  document.getElementById("quoteBtn").addEventListener("click", () => {
+    qi = (qi + 1) % quotes.length;
+    document.getElementById("quoteText").textContent = quotes[qi];
+  });
+</script>
+</body>
+</html>
